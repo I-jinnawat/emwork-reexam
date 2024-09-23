@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title>Update Test Result</title>
+</head>
+
+<body>
+    <h1>Update Test Result</h1>
+    <div>
+        <a href="/report">กลับ</a>
+    </div>
+    <hr>
+    <form action="/tests/update/<%= test._id %>" method="POST">
+        <h2>ข้อมูลส่วนตัว</h2>
+        <label>ชื่อจริง:</label>
+        <input type="text" name="firstName" value="<%= test.firstName %>" required><br>
+
+        <label>นามสกุล:</label>
+        <input type="text" name="lastName" value="<%= test.lastName %>" required><br>
+        <hr>
+
+        <div>
+            <h2>ทดสอบร่างการ</h2>
+            <label>ทดสอบตาบอดสี:</label>
+            <input type="checkbox" name="colorBlindness" <%=test.physicalTest.passedColorBlindness ? 'checked' : ''
+                %>><br>
+
+            <label>ทดสอบสายตายาว:</label>
+            <input type="checkbox" name="farSighted" <%=test.physicalTest.passedFarSighted ? 'checked' : '' %>><br>
+
+            <label>ทดสอบสายตาเอียง:</label>
+            <input type="checkbox" name="astigmatism" <%=test.physicalTest.passedAstigmatism ? 'checked' : '' %>><br>
+
+            <label>ทดสอบการตอบสนองของร่างการ:</label>
+            <input type="checkbox" name="responseTime" <%=test.physicalTest.passedResponseTime ? 'checked' : '' %>><br>
+
+            <div id="physicalTestStatus"></div>
+        </div>
+        <hr>
+
+        <div>
+            <h2>ทดสอบภาคทฤษฏี</h2>
+            <label>ป้ายจราจร (50 คะแนน):</label>
+            <input type="number" name="roadSigns" value="<%= test.theoryTest.roadSigns %>" max="50" required><br>
+
+            <label>เส้นจราจร (50 คะแนน):</label>
+            <input type="number" name="roadLines" value="<%= test.theoryTest.roadLines %>" max="50" required><br>
+
+            <label>การให้ทาง (50 คะแนน):</label>
+            <input type="number" name="rightOfWay" value="<%= test.theoryTest.rightOfWay %>" max="50" required><br>
+
+            <div id="theoryTestStatus"></div>
+        </div>
+        <hr>
+
+        <div>
+            <h2>การสอบภาคปฏิบัติ</h2>
+            <label>ผลการทดสอบปฏิบัติ:</label>
+            <select name="practiceTest">
+                <option value="pass" <%=test.practiceTest.passed ? 'selected' : '' %>>Pass</option>
+                <option value="fail" <%=!test.practiceTest.passed ? 'selected' : '' %>>Fail</option>
+            </select><br><br>
+        </div>
+
+        <hr>
+
+        <div>
+            <h2>วันที่ทดสอบ</h2>
+            <label>วันที่:</label>
+            <input type="date" name="testDate" value="<%= test.testDate.toISOString().split('T')[0] %>" required><br>
+        </div>
+
+        <div id="overallTestStatus"></div>
+        <hr>
+
+        <button type="submit">Update Test Result</button>
+    </form>
+</body>
+
+</html>

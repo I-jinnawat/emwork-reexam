@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title>ทดสอบขอใบอนุญาตขับขี่</title>
+
+
+</head>
+
+<body>
+    <h1>บันทึกผลการทดสอบขอใบอนุญาตขับขี่</h1>
+    <div>
+        <a href="/report">รายงาน
+
+        </a>
+    </div>
+    <hr>
+    <form action="/test" method="post">
+        <h2>ข้อมูลส่วนตัว</h2>
+        <label>ชื่อจริง:</label>
+        <input type="text" name="firstName" required><br>
+
+        <label>นามสกุล:</label>
+        <input type="text" name="lastName" required><br>
+        <hr>
+
+        <div>
+            <h2>ทดสอบร่างการ</h2>
+            <label>ทดสอบตาบอดสี:</label>
+            <input type="checkbox" name="colorBlindness"><br>
+
+            <label>ทดสอบสายตายาว:</label>
+            <input type="checkbox" name="farSighted"><br>
+
+            <label>ทดสอบสายตาเอียง:</label>
+            <input type="checkbox" name="astigmatism"><br>
+
+            <label>ทดสอบการตอบสนองของร่างการ:</label>
+            <input type="checkbox" name="responseTime"><br>
+
+            <p id="physicalTestStatus" style="font-weight: bold; color: red;" data-passed="false">
+                <%= physicalTestStatus %>
+            </p>
+        </div>
+        <hr>
+
+        <div>
+            <h2>ทดสอบภาคทฤษฏี</h2>
+            <label>ป้ายจราจร (50 คะแนน):</label>
+            <input type="number" name="roadSigns" max="50" required><br>
+
+            <label>เส้นจราจร (50 คะแนน):</label>
+            <input type="number" name="roadLines" max="50" required><br>
+
+            <label>การให้ทาง (50 คะแนน):</label>
+            <input type="number" name="rightOfWay" max="50" required><br>
+
+            <p id="theoryTestStatus" style="font-weight: bold; color: red;" data-passed="false">
+                <%= theoryTestStatus %>
+            </p>
+        </div>
+        <hr>
+
+        <div>
+            <h2>การสอบภาคปฏิบัติ</h2>
+            <label>ผลการทดสอบปฏิบัติ:</label>
+            <select name="practiceTest" required>
+                <option value=""></option>
+                <option value="pass">ผ่าน</option>
+                <option value="fail">ไม่ผ่าน</option>
+            </select><br><br>
+        </div>
+        <hr>
+
+        <h2>สถานะการทดสอบ</h2>
+        <p id="overallTestStatus" style="font-weight: bold; color: orange;">
+            <%= overallTestStatus %>
+        </p>
+
+        <button type="submit">ส่งผลการทดสอบ</button>
+    </form>
+</body>
+<script>
+    function checkPhysicalTestStatus() {
+        const colorBlindness = document.querySelector('input[name="colorBlindness"]');
+        const farSighted = document.querySelector('input[name="farSighted"]');
+        const astigmatism = document.querySelector('input[name="astigmatism"]');
+        const responseTime = document.querySelector('input[name="responseTime"]');
+
+        let passedCount = 0;
+        (colorBlindness.checked && passedCount++);
+        (farSighted.checked && passedCount++);
+        (astigmatism.checked && passedCount++);
+        (responseTime.checked && passedCount++);
+
+        const statusElement = document.getElementById('physicalTestStatus');
+        if (passedCount >= 3) {
+            statusElement.innerText = 'คุณผ่านการทดสอบร่างกาย';
+            statusElement.dataset.passed = "true";
+            statusElement.style.color = 'green';
+        } else {
+            statusElement.innerText = 'คุณไม่ผ่านการทดสอบร่างกาย';
+            statusElement.dataset.passed = "false";
+            statusElement.style.color = 'red';
+        }
+        checkOverallStatus();
+    }
+
+    function checkTheoryTestStatus() {
+        const roadSigns = parseInt(document.querySelector('input[name="roadSigns"]').value) || 0;
+        const roadLines = parseInt(document.querySelector('input[name="roadLines"]').value) || 0;
+        const rightOfWay = parseInt(document.querySelector('input[name="rightOfWay"]').value) || 0;
+
+        const totalScore = roadSigns + roadLines + rightOfWay;
+        const maxScore = 150;
+        const percentage = (totalScore / maxScore) * 100;
+
+        const theoryStatusElement = document.getElementById('theoryTestStatus');
+        if (percentage >= 80) {
+            theoryStatusElement.innerText = `คุณผ่านการทดสอบภาคทฤษฎี (${percentage.toFixed(2)}%)`;
+            theoryStatusElement.dataset.passed = "true";
+            theoryStatusElement.style.color = 'green';
+        } else {
+            theoryStatusElement.innerText = `คุณไม่ผ่านการทดสอบภาคทฤษฎี (${percentage.toFixed(2)}%)`;
+            theoryStatusElement.dataset.passed = "false";
+            theoryStatusElement.style.color = 'red';
+        }
+        checkOverallStatus();
+    }
+
+    function checkOverallStatus() {
+        const physicalPassed = document.getElementById('physicalTestStatus').dataset.passed === "true";
+        const theoryPassed = document.getElementById('theoryTestStatus').dataset.passed === "true";
+        const practiceTest = document.querySelector('select[name="practiceTest"]').value;
+
+        const overallStatusElement = document.getElementById('overallTestStatus');
+
+        if (physicalPassed && theoryPassed && practiceTest === "pass") {
+            overallStatusElement.innerText = 'ผ่านการทดสอบ';
+            overallStatusElement.style.color = 'green';
+        } else if (!physicalPassed || !theoryPassed || practiceTest === "fail") {
+            overallStatusElement.innerText = 'ไม่ผ่านการทดสอบ';
+            overallStatusElement.style.color = 'red';
+        } else {
+            overallStatusElement.innerText = 'รอพิจารณา';
+            overallStatusElement.style.color = 'orange';
+        }
+    }
+
+
+    window.onload = function () {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', checkPhysicalTestStatus);
+        });
+
+        const theoryInputs = document.querySelectorAll('input[type="number"]');
+        theoryInputs.forEach(input => {
+            input.addEventListener('input', checkTheoryTestStatus);
+        });
+
+        const practiceTestSelect = document.querySelector('select[name="practiceTest"]');
+        practiceTestSelect.addEventListener('change', checkOverallStatus);
+
+        const form = document.querySelector('form');
+        form.addEventListener('submit', validateForm);
+    };
+</script>
+
+</html>

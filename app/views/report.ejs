@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/style.css">
+    <title>Test Report</title>
+</head>
+
+<body>
+    <div>
+        <a href="/test">กลับ</a>
+    </div>
+    <hr>
+    <div>
+        <h2>Filter by Date</h2>
+        <input type="date" id="filterDate" />
+        <button id="filterButton">Filter</button>
+    </div>
+    <hr>
+    <div>
+        <h2>Search by Name</h2>
+        <input type="text" id="searchName" placeholder="Enter first or last name" value="<%= name %>" />
+        <button id="searchButton">Search</button>
+        <button id="clearSearchButton">Clear Search</button> <!-- Clear Search Button -->
+    </div>
+    <hr>
+    <h2>ผลการทดสอบ</h2>
+    <p>จำนวนผู้ผ่านการทดสอบ: <%= passedCount %>
+    </p>
+    <p>จำนวนผู้ไม่ผ่านการทดสอบ: <%= failedCount %>
+    </p>
+    <hr>
+    <h1>Test Report</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>ชื่อ</th>
+                <th>วันที่ทดสอบ</th>
+                <th>ทดสอบร่างการ</th>
+                <th>ทดสอบภาคทฤษฏี</th>
+                <th>สอบภาคปฏิบัติ</th>
+                <th>สถานะการทดสอบ</th>
+                <th>จัดการ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% tests.forEach((test, index)=> { %>
+                <tr>
+                    <td>
+                        <%= index + 1 %>
+                    </td>
+                    <td>
+                        <%= test.firstName %>
+                            <%= test.lastName %>
+                    </td>
+                    <td>
+                        <%= test.testDate.toDateString() %>
+                    </td>
+                    <td>
+                        ทดสอบตาบอดสี: <%= test.physicalTest.passedColorBlindness ? 'ผ่าน' : 'ไม่ผ่าน' %><br>
+                            ทดสอบสายตายาว: <%= test.physicalTest.passedFarSighted ? 'ผ่าน' : 'ไม่ผ่าน' %><br>
+                                ทดสอบสายตาเอียง: <%= test.physicalTest.passedAstigmatism ? 'ผ่าน' : 'ไม่ผ่าน' %><br>
+                                    ทดสอบสายตาเอียง: <%= test.physicalTest.passedResponseTime ? 'ผ่าน' : 'ไม่ผ่าน' %>
+                    </td>
+                    <td>
+                        ป้ายจราจร: <%= test.theoryTest.roadSigns %><br>
+                            เส้นจราจร: <%= test.theoryTest.roadLines %><br>
+                                การให้ทาง: <%= test.theoryTest.rightOfWay %>
+                    </td>
+                    <td>
+                        <%= test.practiceTest.passed ? 'ผ่าน' : 'ไม่ผ่าน' %>
+                    </td>
+                    <td>
+                        <%= test.status %>
+                    </td>
+                    <td>
+                        <form action="/test/update/<%= test._id %>" method="get" style="display:inline;">
+                            <button type="submit">Update</button>
+                        </form>
+                        <form action="/tests/delete/<%= test._id %>" method="POST" style="display:inline;">
+                            <button type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                <% }) %>
+        </tbody>
+    </table>
+
+    <script>
+        document.getElementById("filterButton").addEventListener("click", function () {
+            const filterDate = document.getElementById("filterDate").value;
+            const query = new URLSearchParams();
+            if (filterDate) query.append("date", filterDate);
+
+            window.location.href = `/report?${query.toString()}`;
+        });
+
+        document.getElementById("searchButton").addEventListener("click", function () {
+            const name = document.getElementById("searchName").value;
+            const filterDate = document.getElementById("filterDate").value;
+            const query = new URLSearchParams();
+            if (name) query.append("name", name);
+            if (filterDate) query.append("date", filterDate);
+
+            window.location.href = `/report?${query.toString()}`;
+        });
+
+        document.getElementById("clearSearchButton").addEventListener("click", function () {
+            document.getElementById("searchName").value = "";
+            document.getElementById("filterDate").value = "";
+            window.location.href = `/report`;
+        });
+    </script>
+</body>
+
+</html>
